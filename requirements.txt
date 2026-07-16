@@ -1,0 +1,6 @@
+langchain-groq
+python-dotenv
+pandas
+langgraph
+docker
+pydatic
