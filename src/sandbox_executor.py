@@ -24,7 +24,8 @@ def run_in_sandbox(code: str, data_path: str, packages: list[str], data_path_in_
     shutil.copy(data_path, os.path.join(run_dir, "data.csv"))
 
     packages_str = " ".join(packages)
-    shell_cmd = f"pip install -q {packages_str} && python script.py"
+    # Enhanced pip install with retries and longer timeouts for network issues
+    shell_cmd = f"pip install -q --retries 5 --default-timeout=100 {packages_str} && python script.py"
 
     client = docker.from_env()
 
@@ -37,6 +38,9 @@ def run_in_sandbox(code: str, data_path: str, packages: list[str], data_path_in_
             remove=True,
             stdout=True,
             stderr=True,
+            network_mode="bridge",
+            dns=["8.8.8.8", "8.8.4.4", "1.1.1.1"],
+            cap_drop=["NET_RAW"],
         )
         return {"success": True, "stdout": output.decode("utf-8", errors="replace"), "stderr": "", "run_dir": run_dir}
 

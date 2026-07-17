@@ -35,10 +35,11 @@ def agent3_model_selector(state: PipelineState) -> dict:
         script that:
         - loads the CSV at the given path with pandas
         - splits into train/test
-        - trains your chosen model on the target column
+        - trains your chosen model on the target column, if u are training a deep learning model use pytorch only.
         - give the list of packages required to execute the code
         - prints accuracy (classification) or RMSE (regression) to stdout
-        - saves the trained model to /workspace/model.joblib using joblib
+        - if u trained a traditional ml model, saves the trained model to /workspace/model.joblib using joblib 
+        ,if it is a deep learning model trained using pytorch save the model to /workspace/model.pt using torch.save
         If given a previous error, fix the underlying issue, don't just retry.
         """
         ),

@@ -3,4 +3,4 @@ python-dotenv
 pandas
 langgraph
 docker
-pydatic
+pydantic
