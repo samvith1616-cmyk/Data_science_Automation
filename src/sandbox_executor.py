@@ -21,7 +21,8 @@ def run_in_sandbox(code: str, data_path: str, packages: list[str], data_path_in_
     with open(script_path, "w", encoding="utf-8") as f:
         f.write(fixed_code)
 
-    shutil.copy(data_path, os.path.join(run_dir, "data.csv"))
+    data_filename = os.path.basename(data_path_in_container)
+    shutil.copy(data_path, os.path.join(run_dir, data_filename))
 
     packages_str = " ".join(packages)
     # Enhanced pip install with retries and longer timeouts for network issues

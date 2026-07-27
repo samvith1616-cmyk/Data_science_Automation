@@ -17,13 +17,13 @@ class Agent3Output(BaseModel):
 
 def agent3_model_selector(state: PipelineState) -> dict:
     error_context = ""
-    if state.get("execution_stderr"):
+    if state.get("agent4_error"):
         error_context = (
             f"\n\nA previous version of this code failed with this error:\n"
-            f"{state['execution_stderr']}\n"
-            f"Fix the root cause instead of retrying unchanged code."
+            f"{state['agent4_error']}\n"
+            f"Analyze the root cause of this specific error and fix it - "
+            f"don't just retry the same code unchanged."
         )
-
     llm = ChatGroq(model="openai/gpt-oss-120b", temperature=0)
     structured_llm = llm.with_structured_output(Agent3Output)
 
@@ -35,12 +35,12 @@ def agent3_model_selector(state: PipelineState) -> dict:
         script that:
         - loads the CSV at the given path with pandas
         - splits into train/test
-        - trains your chosen model on the target column, if u are training a deep learning model use pytorch only.
+        - trains your chosen model on the target column
         - give the list of packages required to execute the code
         - prints accuracy (classification) or RMSE (regression) to stdout
-        - if u trained a traditional ml model, saves the trained model to /workspace/model.joblib using joblib 
-        ,if it is a deep learning model trained using pytorch save the model to /workspace/model.pt using torch.save
-        If given a previous error, fix the underlying issue, don't just retry.
+        - saves the trained model to /workspace/model.joblib using joblib
+        If given a previous error, carefully analyze what caused it and
+        fix the root cause. Do not just retry the same code.
         """
         ),
         ("human", "{query}")
@@ -56,12 +56,18 @@ def agent3_model_selector(state: PipelineState) -> dict:
         )
     })
 
+    if error_context:
+        print(f"[Agent 3] Retrying after error:\n{state.get('agent4_error')}")
+        print(f"[Agent 3] Selected model: {result.model_name}")
+        print(result.code)
+        print(f"[Agent 3] Reasoning: {result.reasoning}")
     return {
         "selected_model": result.model_name,
         "agent3_reasoning": result.reasoning,
         "generated_code": result.code,
         "required_packages": result.required_packages,
         "agent3_retry_count": state.get("agent3_retry_count", 0) + 1,
+
     }
 
 

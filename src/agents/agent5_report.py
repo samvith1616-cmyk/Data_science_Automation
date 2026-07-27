@@ -17,7 +17,7 @@ under a minute of reading.
 
 def agent5_report(state: PipelineState) -> dict:
     llm = ChatGroq(model="llama-3.3-70b-versatile", temperature=0)
-
+    print("[Agent 5] Generating report...")
     prompt = ChatPromptTemplate([
         ("system", REPORT_SYSTEM_PROMPT),
         ("human", "{query}")

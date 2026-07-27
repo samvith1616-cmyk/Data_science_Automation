@@ -24,7 +24,7 @@ ml/
 # Data
 data/runs/
 data/raw/
-
+data/final_report.md
 # Logs
 *.log
 
