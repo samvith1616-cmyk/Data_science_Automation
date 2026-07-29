@@ -33,12 +33,22 @@ def agent3_model_selector(state: PipelineState) -> dict:
         You are an ML Engineer Agent. Given an EDA summary, pick the best
         model for the task and write a complete, self-contained Python
         script that:
-        - loads the CSV at the given path with pandas
+        - The dataset is already mounted inside the Docker container.
+        - ALWAYS load the dataset from exactly:
+            /workspace/preprocessed.csv
+        - Never use Windows paths.
+        - Never use os.path.abspath().
+        - Never infer or construct the dataset path.
+        - Use:
+            DATA_PATH = "/workspace/preprocessed.csv"
         - splits into train/test
         - trains your chosen model on the target column
         - give the list of packages required to execute the code
         - prints accuracy (classification) or RMSE (regression) to stdout
         - saves the trained model to /workspace/model.joblib using joblib
+        - creates a folder called /workspace/plots
+        - generates useful evaluation plots
+        - saves all plots as PNG files inside /workspace/plots
         If given a previous error, carefully analyze what caused it and
         fix the root cause. Do not just retry the same code.
         """
