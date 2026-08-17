@@ -23,3 +23,10 @@ class PipelineState(TypedDict, total=False):
     packages_approved: bool
     final_report_path: str
     status: str
+    user_satisfied: bool
+    preferred_model: str
+    metric_name: str
+    higher_is_better: bool
+    current_metric_value: float
+    best_metric_value: float
+    best_snapshot: dict

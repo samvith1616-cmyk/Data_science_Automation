@@ -9,10 +9,13 @@ load_dotenv()
 
 
 class Agent3Output(BaseModel):
+    #class Agent3Output(BaseModel):
     model_name: str = Field(description="Name of the chosen ML model")
     reasoning: str = Field(description="One or two sentences on why this model fits the data")
     code: str = Field(description="Complete, runnable Python script")
-    required_packages: list[str] = Field(description="List of pip package names the code imports, beyond the Python standard library, e.g. ['pandas', 'scikit-learn']")
+    required_packages: list[str] = Field(description="Pip packages needed")
+    metric_name: str = Field(description="Name of the evaluation metric used, e.g. 'accuracy', 'RMSE', 'F1'")
+    higher_is_better: bool = Field(description="True if a higher metric value is better (e.g. accuracy), False if lower is better (e.g. RMSE)")
 
 
 def agent3_model_selector(state: PipelineState) -> dict:
@@ -23,6 +26,14 @@ def agent3_model_selector(state: PipelineState) -> dict:
             f"{state['agent4_error']}\n"
             f"Analyze the root cause of this specific error and fix it - "
             f"don't just retry the same code unchanged."
+        )
+    preference_context = ""
+    if state.get("preferred_model"):
+        preference_context = (
+            f"\n\nThe user was unsatisfied with the previous model's accuracy "
+            f"and would prefer you try: {state['preferred_model']}. "
+            f"Use this model unless it's clearly unsuitable for the data, "
+            f"in which case briefly explain why and pick the closest reasonable alternative."
         )
     llm = ChatGroq(model="openai/gpt-oss-120b", temperature=0)
     structured_llm = llm.with_structured_output(Agent3Output)
@@ -51,7 +62,11 @@ def agent3_model_selector(state: PipelineState) -> dict:
         - saves all plots as PNG files inside /workspace/plots
         If given a previous error, carefully analyze what caused it and
         fix the root cause. Do not just retry the same code.
-        """
+        - evaluates the model and prints the result in EXACTLY this format on its own line:
+        RESULT_METRIC:<numeric_value>
+        (e.g. "RESULT_METRIC:0.8134" or "RESULT_METRIC:4.52") - no other text on that line
+        - also declare metric_name and higher_is_better matching the metric your code actually computes
+                """
         ),
         ("human", "{query}")
     ])
@@ -63,6 +78,7 @@ def agent3_model_selector(state: PipelineState) -> dict:
             f"target_column = '{state['target_column']}'\n\n"
             f"EDA summary:\n{state['analysis_summary']}"
             f"{error_context}"
+            f"{preference_context}"
         )
     })
 
@@ -77,7 +93,8 @@ def agent3_model_selector(state: PipelineState) -> dict:
         "generated_code": result.code,
         "required_packages": result.required_packages,
         "agent3_retry_count": state.get("agent3_retry_count", 0) + 1,
-
+        "metric_name": result.metric_name,
+        "higher_is_better": result.higher_is_better,
     }
 
 

@@ -9,8 +9,8 @@ if __name__ == "__main__":
     print("Graph saved to pipeline_graph.png")
 
     initial_state = {
-        "raw_data_path": "data/raw.csv",
-        "target_column": "survived",
+        "raw_data_path": "data/raw1.csv",
+        "target_column": "Label",
         "eda_notes": [],
         "agent3_retry_count": 0,
         "max_agent3_retries": 3,

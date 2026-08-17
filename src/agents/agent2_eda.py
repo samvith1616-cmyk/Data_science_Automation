@@ -85,7 +85,7 @@ def agent2_eda(state: PipelineState) -> dict:
             ],
         }
 
-    llm = ChatGroq(model="llama-3.3-70b-versatile", temperature=0)
+    llm = ChatGroq(model="openai/gpt-oss-20b", temperature=0)
     structured_llm = llm.with_structured_output(EDAAnalysis)
 
     prompt = ChatPromptTemplate([

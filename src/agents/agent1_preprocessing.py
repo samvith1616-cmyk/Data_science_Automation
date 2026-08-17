@@ -36,7 +36,7 @@ def generate_preprocessing_code(profile: str, target_column: str, error_context:
         You are a Data Preprocessing Code Generation Agent. Given a dataset
         profile (shape, dtypes, missing value counts) and a target column,
         write a complete Python script that:
-        - loads the CSV at /workspace/data.csv with pandas
+        - loads the provided dataset in given format at /workspace/data.csv with pandas or any required library
         - drops duplicate rows
         - fills missing values appropriately (median for numeric, mode/'Unknown' for categorical)
         - one-hot encodes categorical columns EXCEPT the target column

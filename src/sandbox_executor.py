@@ -65,3 +65,12 @@ def run_in_sandbox(
             "stderr": stderr,
             "run_dir": run_dir,
         }
+
+def extract_result_metric(stdout: str) -> float | None:
+    for line in stdout.splitlines():
+        if line.startswith("RESULT_METRIC:"):
+            try:
+                return float(line.split(":", 1)[1].strip())
+            except ValueError:
+                return None
+    return None
